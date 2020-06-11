@@ -1,0 +1,296 @@
+\documentclass[a4paper,10pt]{extarticle}
+\usepackage{amssymb,amsmath,amsthm,amsfonts}
+\usepackage{multicol,multirow}
+\usepackage{calc}
+\usepackage{ifthen}
+\usepackage{tabularx}
+\usepackage{listings}
+\usepackage{caption}
+\usepackage[utf8]{inputenc}
+\usepackage[landscape]{geometry}
+\usepackage[colorlinks=true,citecolor=blue,linkcolor=blue]{hyperref}
+\usepackage{accents}
+\newcommand{\vect}[1]{\accentset{\rightharpoonup}{#1}}
+
+
+\DeclareCaptionLabelFormat{algocaption}{Algorithm \thenalg} % defines a new caption label as Algorithm x.y
+
+\lstnewenvironment{algorithm}[1][] %defines the algorithm listing environment
+{   
+    %\refstepcounter{nalg} %increments algorithm number
+    %\captionsetup{labelformat=algocaption,labelsep=colon} %defines the caption setup for: it ises label format as the declared caption label above and makes label and caption text to be separated by a ':'
+    \lstset{ %this is the stype
+        mathescape=true,
+        %frame=tB,
+        %numbers=left, 
+        numberstyle=\tiny,
+        basicstyle=\scriptsize, 
+        keywordstyle=\color{black}\bfseries\em,
+        keywords={,vhod, izhod, vrni, dokler, izvajaj, konec, zanke} %add the keywords you want, or load a language as Rubens explains in his comment above.
+        %numbers=left,
+        %xleftmargin=.04\textwidth,
+        %#1 % this is to add specific settings to an usage of this environment (for instnce, the caption and referable label)
+    }
+}
+{}
+
+
+\ifthenelse{\lengthtest { \paperwidth = 11in}}
+    { \geometry{top=.5in,left=.5in,right=.5in,bottom=.5in} }
+	{\ifthenelse{ \lengthtest{ \paperwidth = 297mm}}
+		{\geometry{top=1cm,left=1cm,right=1cm,bottom=1cm} }
+		{\geometry{top=1cm,left=1cm,right=1cm,bottom=1cm} }
+	}
+\pagestyle{empty}
+\makeatletter
+\renewcommand{\section}{\@startsection{section}{1}{0mm}%
+                                {-1ex plus -.5ex minus -.2ex}%
+                                {0.5ex plus .2ex}%x
+                                {\normalfont\large\bfseries}}
+\renewcommand{\subsection}{\@startsection{subsection}{2}{0mm}%
+                                {-1explus -.5ex minus -.2ex}%
+                                {0.5ex plus .2ex}%
+                                {\normalfont\normalsize\bfseries}}
+\renewcommand{\subsubsection}{\@startsection{subsubsection}{3}{0mm}%
+                                {-1ex plus -.5ex minus -.2ex}%
+                                {1ex plus .2ex}%
+                                {\normalfont\small\bfseries}}
+\makeatother
+\setcounter{secnumdepth}{0}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{0pt plus 0.5ex}
+% -----------------------------------------------------------------------
+
+\title{Diskretne strukture}
+
+\begin{document}
+
+\raggedright
+\footnotesize
+\begin{multicols}{3}
+\section{Predstavitev števil}
+$r\ \dots $ baza\\
+$b = (b_n-1, ..., b_0)\ \dots $ število v bazi $r$ s števkami $b_1$\\ 
+\begin{itemize}
+    \item \textbf{nepredznačeno celo število}
+    $V = \sum_{i=0}^{n}b_ir^i$
+    \item \textbf{predznak in velikost (PV)} 
+    $V = (-1)^{b_{n-1}} \sum_{i=0}^{n-2} b_i2^i$ \\
+    prvi bit ($b_{n-1}$) predstavlja predznak ($1\to -$,$0 \to +$), ostali pa velikost.
+    \item \textbf{z odmikom}
+    $V = \sum_{i=0}^{n-1} \ -\ \underbrace{2^{n-1}}_\textmd{odmik}$ \\
+    \item \textbf{eniški komplement (1'K)}
+    $V = \sum_{i=0}^{n-1} b_i 2^i - b_{n-1}(2^n-1) $ \\
+    prvi bit predstavlja predznak ($1\to -$,$0 \to +$). Negativno število dobimo tako, da invertiramo vse bite pozitivnega števila.
+    \item \textbf{dvojiši komplement (2'K)}
+    $V = \sum_{i=0}^{n-1} b_i 2^i - b_{n-1}2^n$ \\
+    Negativno število dobimo tako da bite inveritramo in prištejemo 1.
+    \item \textbf{pozicijska notacija}
+    $V = \sum_{i=-m}^{n-1}b_ir^i$
+\end{itemize}
+\subsection{Plavajoča vejica}
+\begin{itemize}
+    \item enojna natančnost \emph{32 bit}\\
+    prvi bit je predznak $S$ ($1\to -$,$0 \to +$)\\
+    sledi $8$-biten eksponent $e$ zapisan z odmikom ($e = E-127$)\\
+    sledi $23$-bitna mantisa $m$\\
+    prvi bit mantise je implicitno podan: če je eksponent $E = 0$ (v tem primeru je $e = -126$ in ne $-127$) je mantisa oblike $0,m$, sicer je oblike $1,m$.\\
+    če so vsi biti eksponenta $1$ in vsi biti mantise $0$, je vrednost $\pm\infty$.\\
+    če so vsi biti eksponenta $1$ in vsi biti mantise niso $0$, je vrednost NaN.\\
+    \item dvojna natančnost \emph{64 bit}\\
+    prvi bit je predznak\\
+    sledi $11$-biten eksponent z odmikom $1023$\\
+    in $53$-bitna mantisa\\
+    \item normirana vrednost $(-1)^S\cdot(1,m)\cdot 2^e$
+    \item denormirana vrednost $(-1)^S\cdot(0,m)\cdot 2^{e+1}$
+    \item aritmetika v plavajoči vejici\\
+    Zaokrožujemo k najbližji vrednosti, ki se jo da predstaviti (preferiramo soda števila).\\
+    Pri računanju mantiso podaljšamo za 3 bite (\emph{varovalni, zaokroževalni, lepljivi})
+\end{itemize}
+\subsubsection{Seštevanje v plavajoči vejici}
+\begin{itemize}
+    \item Obe števili zapišemo z večjim eksponentom (premik mantise, če izpadajo kake enice, se shranijo v leplijvem bitu)
+    \item Mantisi seštejemo, če se pojavi prenos naprej, zmanjšamo mantiso in povečamo eksponent.
+\end{itemize}
+\subsubsection{Množenje v plavajoči vejici}
+\begin{itemize}
+    \item eksponenta seštejemo
+    \item mantisi zmnožimo v fiksni vejici
+\end{itemize}
+
+
+\textbf{Prenos} se pojavi, ko rezultat neke operacije preseže obseg števil. (nanaše se le na operacije z \emph{nepredznačenimi} števili; pri 2'K se ignorira)\\
+\textbf{Preliv} se pojavi če ima rezultat drugačen predznak kot števili.
+
+\section{CPE}
+\begin{equation*}
+    \begin{aligned}    
+        t_{CPE}\ \dots\ & \textmd{dolžina med dvema periodama} \\
+        f_{CPE} = 1/t_{CPE}\ \dots\ & \textmd{frekvenca ure} \\
+        CPI = \sum_{i=0}^{n} CPI_i p_i \ \dots\ & \textmd{povprečno število urinih preiod na ukaz} \\  
+        MIPS = 1/(CPI\cdot t_{CPE}\cdot 10^6)\ \dots\ & \textmd{million instructions per second} \\  
+    \end{aligned}
+\end{equation*}
+
+\section{Predpomnilnik}
+\begin{equation*}
+    \begin{aligned}    
+        t_{ap}\ \dots\ & \textmd{čas dostopa do predpomnilnika} \\
+        t_{ag}\ \dots\ & \textmd{čas dostopa do glavnega pomnilnika} \\
+        H\ \dots\ & \textmd{verjetnost zadetka}\\
+        t_B\ \dots\ & \textmd{čas za prenos celega bloka}\\
+        t_a = t_{ap} + (1-H)t_B\ \dots\ & \textmd{povprečen čas dostopa}\\
+    \end{aligned}
+\end{equation*}
+
+\subsubsection{Set asociativni predpomnilnik (SAPP)}
+\begin{equation*}
+    \begin{aligned}    
+        n\ \dots\ & \textmd{dolžina naslova} \\
+        B = 2^b\ \dots\ & \textmd{Število besed v bloku} \\
+        S = 2^s\ \dots\ & \textmd{število setov, vsak set je majhen APP} \\
+        E = 2^e\ \dots\ & \textmd{število blokov v setu (\textbf{stopnja asociativnosti})} \\
+        M_b = S\cdot E\ \dots\ & \textmd{število blokov v PP}\\
+        M = S\cdot E\cdot B\ \dots\ & \textmd{velikost PP}\\
+    \end{aligned}
+\end{equation*}
+\begin{itemize}
+    \item vsak naslov ($A_i$) iz GP se lahko preslika le v en set ($S_i$).
+    \[S_i = \underbrace{A_i[n-1 : b]}_\textmd{zgornji biti naslova} \% 2^s\ \dots\ \textmd{naslov seta }\textit{(predpomnilniški indeks)} \]
+    \item iz naslova ($A_i$) se prebere naslov bloka (zgornjih $n-b$ bitov) in naslov besede (spodnjih $b$ bitov).
+\end{itemize}
+
+\subsubsection{Čisti asociativni predpomnilnik (APP)}
+\begin{itemize}
+    \item samo en set $S=1$, posledično $E=M_b$
+    \item vsak blok sprejme katerikoli del iz GP
+    \item največja verjetnost zadetka
+\end{itemize}
+
+\subsubsection{Direktni predpomnilnik}
+To je SAPP kjer je v vsakem setu le en blok $E=1$.
+
+\subsection{Zgrešitve}
+Ob zgrešitvi se v PP prenese cel nov blok. Če v setu ni več prostora, se en blok zamenja (naključna strategija, \emph{Least Recently Used} strategija).
+\subsubsection{Vrste zgrešitev}
+\begin{itemize}
+    \item \textbf{obvezne zgrešitve} pojavijo se vsakič, ko nek blok pomnilnika zahtevamo \emph{prvič}.
+    \item \textbf{velikostne zgrešitve} ko moramo naložiti nek blok, ki smo ga sicer že imeli a smo ga morali zamenjati zaradi prostorske stiske.
+    \item \textbf{konfliktne zgrešitve} ko moramo naložiti nek blok, ki smo ga sicer že imeli a smo ga morali zamenjati, ker se je nek drug blok preslikal v isti set.
+\end{itemize}
+
+\subsection{Vpliv predpomnilnika na hitrost}
+\[CPE_\textmd{čas} = (CPE_{\textmd{periode}_\textmd{izvrš.}} + CPE_{\textmd{periode}_\textmd{čaka.}})t_{CPE}\]
+\[CPE_{\textmd{periode}_\textmd{izvrš.}} = I\cdot CPI_\textmd{idealni}\]
+\[CPE_{\textmd{periode}_\textmd{čaka.}} = N(1-H)K_Z\]
+$I\ \dots\ $št. ukazov\\
+$N\ \dots\ $št. pomnilniških dostopov\\
+$H\ \dots\ $povprečna verjetnost zadetka PP\\
+$K_Z\ \dots\ $povprečna zgrešitvena kazen\\
+$CPI_\textmd{idealni}\ \dots\ $št. period na ukaz s predpostavko, da ni zgrešitev\\
+
+\section{Sklad}
+\begin{tabular}{ r|l } 
+    r0 & ničla \\ 
+    r1-r23 & splošno namenski registri \\ 
+    r24 & prvi parameter ob klicu podprograma \\
+    r25 & drugi parameter ob klicu podprograma \\
+    r26 & bazni register za dolge skoke \\
+    r27 & bazni register za dolge klice \\
+    r28 & return value \\
+    r29 & \textbf{FP} frame pointer \\
+    r30 & \textbf{SP} stack pointer \\
+    r31 & return address \\ 
+\end{tabular}
+\\\
+\\\
+\\\
+\begin{tabular}{ r | r}
+\begin{lstlisting}
+push reg:
+    sw 0(r30), reg
+    subui r30, r30, #4
+\end{lstlisting}
+&
+\begin{lstlisting}
+pop reg:
+    addui r30, r30, #4
+    lw reg, 0(r30)
+\end{lstlisting}
+\end{tabular}
+
+\subsection{Klic podprograma}
+\begin{itemize}
+    \item prva dva parametra shranimo v r24 in r25
+    \item ostale parametre porinemo na sklad
+    \item pokličemo podprogram z ukazom 
+\end{itemize}
+\subsubsection{Klicani podprogram ob vstopu}
+\begin{itemize}
+    \item na sklad porine \textbf{povratni naslov} (push r31)
+    \item sa sklad porine \textbf{star kazalec na okvir} (push r29)
+    \item \textbf{kazalec na okvir} nastavi na \textbf{skladovni kazalec} (r29 $\leftarrow$ r30)
+    \item po potrebi rezervira prostor na skladu za lokalne spremenljivke (skladovni kazalec premakne/pomanjša za velikost lokalnih spremenljivk)
+    \item na sklad shrani vse registre, ki jih bo spreminjal
+\end{itemize}
+\subsubsection{Klicani program med izvajanjem}
+\begin{itemize}
+    \item parametrov in lokalnih spremenljivk dostopamo prek kazalca na okvir
+    \begin{itemize}
+        \item prva lokalna spremenljivka je na MEM[FP]
+        \item star kazalec na okvir je na MEM[FP+4]
+        \item povratni naslov je na MEM[FP+8]
+        \item zadnji parameter je na MEM[FP+12]
+    \end{itemize}
+\end{itemize}
+\subsubsection{Klicani podprogram pred izstopom}
+\begin{itemize}
+    \item v r28 shrani vrednost, ki jo vrača
+    \item s sklada obnovi vse shranjene registre
+    \item s sklada pobriše vse lokalne spremenljivke (r30 $\leftarrow$ r29)
+    \item s sklada obnovi staro vrednost kazalca na okvir (pop r29)
+    \item s sklada obnovi povratni naslov (pop r31)
+    \item skoči na povratni naslov
+\end{itemize}
+\subsubsection{Po vrnitvi iz podprograma}
+\begin{itemize}
+    \item izbrišemo parametre iz sklada
+\end{itemize}
+
+\section{Cevovod}
+Procesor HIP deluje v 5 stopnjah (ki se odvijajo naenkrat)
+\begin{itemize}
+    \item \textbf{IF} instruction fetch - \emph{prevzem instrukcije iz GP}
+    \item \textbf{ID} instruction decode - \emph{dekodiranje ukaza in branje iz registrov}
+    \item \textbf{EX} execute - \emph{izvršitev operacije (na ALU)}
+    \item \textbf{MEM} memory - \emph{dostop do pomnilnika}
+    \item \textbf{WB} write back - \emph{shranjevanje reultata (v reg)}
+\end{itemize}
+\section{Cevovodne nevarnosti}
+\subsubsection{Strukturne nevarnosti}
+Več stopenj uporablja isto enoto. \emph{ne pri HIP}
+\subsubsection{Podatkovne nevarnosti}
+Ukaz kot parameter potrebuje še neizračunan rezultat prejšnjega ukaza \emph{samo v ID}. Rešujemo jih lahko:
+\begin{itemize}
+    \item \textbf{programsko} - vstavljanje nop za problematične ukaze
+    \item \textbf{cevovodna zaklenitev} - ko procesor (v stopnji ID) zazna nevarnost, v cevovod vstavlja "mehurčke"
+    \item \textbf{premoščanje} - rezultate iz EX, MEM ali WB prenesemo v ID, če to ni mogoče (pri load), vstavimo mehurček
+    \item \textbf{razvrščanje} - ukaze razvrstimo tako, da odpravimo nevarnost
+\end{itemize}
+\subsubsection{Kontrolne nevarnosti}
+Pri ukazih (skokih), ki spreminjajo PC.\\
+\emph{HIP nov naslov izračuna že v ID, pri pogojnih skokih se PC lahko spremeni v EX (vsebina IF in ID postane neveljavna)} Procesor predpostavi, da skoka ne bo.\\
+Rešitve:
+\begin{itemize}
+    \item \textbf{vstavljanje mehurčkov} v primeru skoka se v stopnji IF in ID vstavita mehurčka, sicer pa gre vse normalno naprej.
+    \item \textmd{predikcija skočnega pogoja}
+    \begin{itemize}
+        \item \textbf{statična} med izvrševanjem se ne spreminja
+        \item \textbf{dinamična} procesor si zapomni vrednost prejšnjih skokov
+    \end{itemize}
+    \item \textbf{zakasnjeni skoki} : v \emph{skočne reže} (pri HIP 2 ukaza za skokom) damo ukaze, ki bi se morali izvesti pred skokom in ne vplivajo na pogoj skoka.
+\end{itemize}
+
+
+\end{multicols}
+\end{document}

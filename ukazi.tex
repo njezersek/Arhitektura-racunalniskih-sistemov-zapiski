@@ -1,0 +1,133 @@
+\documentclass[a4paper,9pt]{extarticle}
+\usepackage{amssymb,amsmath,amsthm,amsfonts}
+\usepackage{multicol,multirow}
+\usepackage{calc}
+\usepackage{ifthen}
+\usepackage{tabularx}
+\usepackage{listings}
+\usepackage{caption}
+\usepackage[utf8]{inputenc}
+\usepackage[]{geometry}
+\usepackage[colorlinks=true,citecolor=blue,linkcolor=blue]{hyperref}
+\usepackage{accents}
+\usepackage{xparse}
+\newcommand{\vect}[1]{\accentset{\rightharpoonup}{#1}}
+
+
+\DeclareCaptionLabelFormat{algocaption}{Algorithm \thenalg} % defines a new caption label as Algorithm x.y
+
+\lstnewenvironment{algorithm}[1][] %defines the algorithm listing environment
+{   
+    %\refstepcounter{nalg} %increments algorithm number
+    %\captionsetup{labelformat=algocaption,labelsep=colon} %defines the caption setup for: it ises label format as the declared caption label above and makes label and caption text to be separated by a ':'
+    \lstset{ %this is the stype
+        mathescape=true,
+        %frame=tB,
+        %numbers=left, 
+        numberstyle=\tiny,
+        basicstyle=\scriptsize, 
+        keywordstyle=\color{black}\bfseries\em,
+        keywords={,vhod, izhod, vrni, dokler, izvajaj, konec, zanke} %add the keywords you want, or load a language as Rubens explains in his comment above.
+        %numbers=left,
+        %xleftmargin=.04\textwidth,
+        %#1 % this is to add specific settings to an usage of this environment (for instnce, the caption and referable label)
+    }
+}
+{}
+
+
+\ifthenelse{\lengthtest { \paperwidth = 11in}}
+    { \geometry{top=.5in,left=.5in,right=.5in,bottom=.5in} }
+	{\ifthenelse{ \lengthtest{ \paperwidth = 297mm}}
+		{\geometry{top=1cm,left=1cm,right=1cm,bottom=1cm} }
+		{\geometry{top=1cm,left=1cm,right=1cm,bottom=1cm} }
+	}
+\pagestyle{empty}
+\makeatletter
+\renewcommand{\section}{\@startsection{section}{1}{0mm}%
+                                {-1ex plus -.5ex minus -.2ex}%
+                                {0.5ex plus .2ex}%x
+                                {\normalfont\large\bfseries}}
+\renewcommand{\subsection}{\@startsection{subsection}{2}{0mm}%
+                                {-1explus -.5ex minus -.2ex}%
+                                {0.5ex plus .2ex}%
+                                {\normalfont\normalsize\bfseries}}
+\renewcommand{\subsubsection}{\@startsection{subsubsection}{3}{0mm}%
+                                {-1ex plus -.5ex minus -.2ex}%
+                                {1ex plus .2ex}%
+                                {\normalfont\small\bfseries}}
+\makeatother
+\setcounter{secnumdepth}{0}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{0pt plus 0.5ex}
+% -----------------------------------------------------------------------
+
+\title{Diskretne strukture}
+
+\begin{document}
+
+\raggedright
+\footnotesize
+
+
+{\fontfamily{pcr}\selectfont
+    \begin{tabular}{| p{0.6cm} | p{4cm} | p{3cm} | p{4cm} | p{3cm} | l | l | }
+        \hline
+        add     & add (signed)                          & add Rd,Rs1,Rs2        & Rd  <- Rs1 + Rs2                      & add r1,r2,r3                          & C0430800  & 4\\ \hline
+        addi    & add immediate                         & addi Rd,Rs1,\#n       & Rd <- Rs1 + n, sign ext.              & addi r1,r2,\#0x1234                   & 00411234  & 4\\ \hline
+        addu    & add unsigned                          & addu Rd,Rs1,Rs2       & Rd <- Rs1 + Rs2,unsigned              & addu r1,r2,r3                         & C8430800  & 4\\ \hline
+        addui   & add unsigned immediate                & addui Rd,Rs1,\#n      & Rd <- Rs1 + n,unsigned                & addui r1,r2,\#0x1234                  & 08411234  & 4\\ \hline
+        and     & logical and                           & and Rd,Rs1,Rs2        & Rd <- Rs1 and Rs2                     & and r1,r2,r3                          & D0430800  & 4\\ \hline
+        andi    & and immediate                         & andi Rd,Rs1,\#n       & Rd <- Rs1 and n                       & andi r1,r2,\#0x1234                   & 10411234  & 4\\ \hline
+        beq     & branch if equal                       & beq Rd,LABEL          &  Rd == 0 => PC <- LABEL(relative)     & beq r0,L1(L1 na za 4 večjem naslovu)  & 9C000000  & 3\\ \hline
+        bne     & branch if not equal                   & bne Rd,LABEL          & Rd != 0 => PC <- LABEL(relative)      & bne r0,L1(L1 na za 4 večjem naslovu)  & 8C000000  & 3\\ \hline
+        call    & call subroutine                       & call Rd,LABEL(Rs1)    & Rd <- PC + 4,PC <- LABEL + Rs1        & call r1,SR(r0) (SR na naslovu 0xD4)   & B40100D4  & 5\\ \hline
+        di      & disable interrupts                    & di                    & I <- 0                                & di                                    & D0000001  & 3\\ \hline
+        ei      & enable interrupts                     & ei                    & I <- 1                                & ei                                    & CC000001  & 3\\ \hline
+        halt    & halts execution                       & halt                  &                                       & halt                                  & 7C000000  & 3\\ \hline
+        j       & jump                                  & j LABEL(Rs1)          & PC <- LABEL + Rs1                     & j L1(r0)(L1 na naslovu 0x30)          & B0000030  & 3\\ \hline
+        lb      & load byte                             & lb Rd,OFFSET(Rs1)     & Rd <- MEM[OFFSET+Rs1], sign extended  & lb r1,0(r2)                           & 90410000  & 6\\ \hline
+        lbu     & load byte unsigned                    & lbu Rd,OFFSET(Rs1)    & Rd <- MEM[OFFSET+Rs1], unsigned       & lbu r1,0(r2)                          & 80410000  & 6\\ \hline
+        lh      & load halfword (16 bit)                & lh Rd,OFFSET(Rs1)     & Rd <- MEM[OFFSET+Rs1], sign extended  & lh r1,0(r2)                           & 94410000  & 6\\ \hline 
+        lhi     & load high immediate                   & lhi Rd,\#n            & Rd(31..16) <- n,Rd(15..0) <- 0        & lhi r1,\#0x12340000                   & 1C011234  & 4\\ \hline
+        lhu     & load halfword unsigned (16 bit)       & lhu Rd,OFFSET(Rs1)    & Rd <- MEM[OFFSET+Rs1],unsigned        & lhu r1,0(r2)                          & 84410000  & 6\\ \hline
+        lw      & load word (32 bit)                    & lw rd,OFFSET(Rs1)     & Rd <- MEM[OFFSET+Rs1]                 & lw r1,0(r2)                           & 98410000  & 6\\ \hline
+        mover   & move from EPC to register             & mover Rd              & Rd <- EPC                             & mover r1                              & D4000801  & 4\\ \hline
+        movre   & move from register to EPC             & movre Rs1             & EPC <- Rs1                            & movre r0                              & D8000001  & 3\\ \hline
+        nop     & no operation                          & nop                   &                                       & nop                                   & 00000000  & 4\\ \hline
+        not     & not (1's complement)                  & not Rd,Rs1,Rs2        & Rd <- not Rs1                         & not r1,r2,r3                          & F8430800  & 4\\ \hline
+        or      & logical or                            & or Rd,Rs1,Rs2         & Rd <- Rs1 or Rs2                      & or r1,r2,r3                           & D4430800  & 4\\ \hline
+        ori     & logical or immediate                  & ori Rd,Rs1,\#n        & Rd <- Rs1 or n                        & ori r1,r2,\#0x1234                    & 14411234  & 4\\ \hline
+        rfe     & return from exception                 & rfe                   & PC <- EPC                             & rfe                                   & BC000000  & 3\\ \hline
+        sb      & store byte                            & sb OFFSET(Rs1),Rd     & MEM[OFFSET+Rs1] <- Rd                 & sb 0(r2),r3                           & A0430000  & 4\\ \hline
+        seq     & set if equal                          & seq Rd,Rs1,Rs2        & Rd <- Rs1 == Rs2                      & seq r1,r2,r3                          & E0430800  & 4\\ \hline
+        seqi    & set if equal immediate                & seqi Rd,Rs1,\#n       & Rd <- Rs1 == n                        & seqi r1,r2,\#0x1234                   & 20411234  & 4\\ \hline
+        sgt     & set if greater than                   & sgt Rd,Rs1,Rs2        & Rd <- Rs1 > Rs2                       & sgt r1,r2,r3                          & EC430800  & 4\\ \hline
+        sgti    & set if greater than immediate         & sgti Rd,Rs1,\#n       & Rd <- Rs1 > n                         & sgti r1,r2,\#0x1234                   & 2C411234  & 4\\ \hline
+        sgtu    & set if greater than unsigned          & sgtu Rd,Rs1,Rs2       & Rd <- Rs1 > Rs2 unsigned              & sgtu r1,r2,r3                         & F4430800  & 4\\ \hline
+        sgtui   & set if greater than unsigned immediate& sgtui Rd,Rs1,\#n      & Rd <- Rs1 > n unsigned                & sgtui r1,r2,\#0x1234                  & 34411234  & 4\\ \hline
+        sh      & store halfword (16 bit)               & sh OFFSET(Rs1),Rd     & MEM[OFFSET+Rs1] <- Rd                 & sh 0(r2),r3                           & A4430000  & 4\\ \hline
+        sll     & shift left logical                    & sll Rd,Rs1,Rs2        & Rd <- Rs1 << Rs2, b0 <- 0             & sll r1,r2,r3                          & C0430801  & 4\\ \hline
+        slli    & shift left logical immediate          & slli Rd,Rs1,\#n       & Rd <- Rs1 << n, b0 <- 0               & slli r1,r2,\#0x1234                   & 40411234  & 4\\ \hline
+        slt     & set if less than                      & slt Rd,Rs1,Rs2        & Rd <- Rs1 < Rs2                       & slt r1,r2,r3                          & E8430800  & 4\\ \hline
+        slti    & set if less than immediate            & slti Rd,Rs1,\#n       & Rd <- Rs1 < n                         & slti r1,r2,\#0x1234                   & 28411234  & 4\\ \hline
+        sltu    & set if less than unsigned             & sltu Rd,Rs1,Rs2       & Rd <- Rs1 < Rs2 unsigned              & sltu r1,r2,r3                         & F0430800  & 4\\ \hline
+        sltui   & set if less than unsigned immediate   & sltui Rd,Rs1,\#n      & Rd <- Rs1 < n unsigned                & sltui r1,r2,\#0x1234                  & 30411234  & 4\\ \hline
+        sne     & set if not equal                      & sne Rd,Rs1,Rs2        & Rd <- Rs1 != Rs2                      & sne r1,r2,r3                          & E4430800  & 4\\ \hline
+        snei    & set if not equal immediate            & snei Rd,Rs1,\#n       & Rd <- Rs1 != n                        & snei r1,r2,\#0x1234                   & 24411234  & 4\\ \hline
+        sra     & shift right arithmetic                & sra Rd,Rs1,Rs2        & Rd <- Rs1 >> Rs2, b31 <- b31          & sra r1,r2,r3                          & C8430801  & 4\\ \hline
+        srai    & shift right arithmetic immediate      & srai Rd,Rs1,\#n       & Rd <- Rs1 >> n, b31 <- b31            & srai r1,r2,\#0x1234                   & 48411234  & 4\\ \hline
+        srl     & shift right logical                   & srl Rd,Rs1,Rs2        & Rd <- Rs1 >> Rs2, b31 <- 0            & srl r1,r2,r3                          & C4430801  & 4\\ \hline
+        srli    & shift right logical immediate         & srli Rd,Rs1,\#n       & Rd <- Rs1 >> n, b31 <- 0              & srli r1,r2,\#0x1234                   & 44411234  & 4\\ \hline
+        sub     & subtract                              & sub Rd,Rs1,Rs2        & Rd <- Rs1 - Rs2                       & sub r1,r2,r3                          & C4430800  & 4\\ \hline
+        subi    & subtract immediate                    & subi Rd,Rs1,\#n       & Rd <- Rs1 - n, sign extended          & subi r1,r2,\#0x1234                   & 04411234  & 4\\ \hline
+        subu    & subtract unsigned                     & subu Rd,Rs1,Rs2       & Rd <- Rs1 - Rs2                       & subu r1,r2,r3                         & CC430800  & 4\\ \hline
+        subui   & subtract unsigned immediate           & subui Rd,Rs1,\#n      & Rd <- Rs1 - n, unsigned               & subui r1,r2,\#0x1234                  & 0C411234  & 4\\ \hline
+        sw      & store word (32 bit)                   & sw OFFSET(Rs1),Rd     & MEM[OFFSET+Rs1] <- Rd                 & sw 0(r2),r3                           & A8430000  & 4\\ \hline
+        trap    & software interrupt                    & trap \#n              & EPC <- PC, PC <- M[FFFFFF00+4*n]      & trap \#2                              & B8000002  & 6\\ \hline
+        xor     & exclusive or                          & xor Rd,Rs1,Rs2        & Rd <- Rs1 xor Rs2                     & xor r1,r2,r3                          & D8430800  & 4\\ \hline
+        xori    & exclusive or immediate                & xori Rd,Rs1,\#n       & Rd <- Rs1 xor n                       & xori r1,r2,\#0x1234                   & 18411234  & 4\\ \hline 
+\end{tabular}
+}\\
+
+\end{document}

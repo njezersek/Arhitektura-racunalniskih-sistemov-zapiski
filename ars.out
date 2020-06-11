@@ -1,0 +1,23 @@
+\BOOKMARK [1][-]{section*.1}{Predstavitev \235tevil}{}% 1
+\BOOKMARK [2][-]{section*.2}{Plavajoca vejica}{section*.1}% 2
+\BOOKMARK [3][-]{section*.3}{Se\235tevanje v plavajoci vejici}{section*.2}% 3
+\BOOKMARK [3][-]{section*.4}{Mno\236enje v plavajoci vejici}{section*.2}% 4
+\BOOKMARK [1][-]{section*.5}{CPE}{}% 5
+\BOOKMARK [1][-]{section*.6}{Predpomnilnik}{}% 6
+\BOOKMARK [2][-]{section*.7}{Set asociativni predpomnilnik \(SAPP\)}{section*.6}% 7
+\BOOKMARK [3][-]{section*.8}{Cisti asociativni predpomnilnik \(APP\)}{section*.7}% 8
+\BOOKMARK [3][-]{section*.9}{Direktni predpomnilnik}{section*.7}% 9
+\BOOKMARK [2][-]{section*.10}{Zgre\235itve}{section*.6}% 10
+\BOOKMARK [3][-]{section*.11}{Vrste zgre\235itev}{section*.10}% 11
+\BOOKMARK [2][-]{section*.12}{Vpliv predpomnilnika na hitrost}{section*.6}% 12
+\BOOKMARK [1][-]{section*.13}{Sklad}{}% 13
+\BOOKMARK [2][-]{section*.14}{Klic podprograma}{section*.13}% 14
+\BOOKMARK [3][-]{section*.15}{Klicani podprogram ob vstopu}{section*.14}% 15
+\BOOKMARK [3][-]{section*.16}{Klicani program med izvajanjem}{section*.14}% 16
+\BOOKMARK [3][-]{section*.17}{Klicani podprogram pred izstopom}{section*.14}% 17
+\BOOKMARK [3][-]{section*.18}{Po vrnitvi iz podprograma}{section*.14}% 18
+\BOOKMARK [1][-]{section*.19}{Cevovod}{}% 19
+\BOOKMARK [1][-]{section*.20}{Cevovodne nevarnosti}{}% 20
+\BOOKMARK [2][-]{section*.21}{Strukturne nevarnosti}{section*.20}% 21
+\BOOKMARK [3][-]{section*.22}{Podatkovne nevarnosti}{section*.21}% 22
+\BOOKMARK [3][-]{section*.23}{Kontrolne nevarnosti}{section*.21}% 23
